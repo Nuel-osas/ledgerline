@@ -1,25 +1,27 @@
 # Ledgerline
 
-**A worker paid in stablecoins on another chain proves that income to Creditcoin, and gets a
-credit line without posting collateral.**
+**A DePIN operator proves the revenue their hardware earns on another chain, and finances more
+hardware against it on Creditcoin. No collateral is posted, at any point.**
 
 Built for BUIDL CTC 2026 Fall on Creditcoin's Attestcoin Protocol.
 
 ## The problem
 
-Creditcoin exists because a repayment record is an asset, and most of the world's is invisible
-on-chain. A gig worker paid in USDC on Base has no capital on Creditcoin and nothing to pledge —
-so under every collateralised lending design, they cannot borrow. What they do have is six months
-of provable income on a chain that isn't this one.
+A wireless hotspot, a solar meter, a storage node: each settles its revenue on whichever chain its
+network runs on. To grow, the operator needs capital for the next unit of hardware. Under every
+collateralised design they cannot get it, because they hold nothing on the lending chain.
 
-Getting that history here has always required trusting someone: a bridge, an oracle committee, an
-attester-of-record. Ledgerline removes them.
+What they do have is an earnings record. Moving that record across has always required trusting
+someone: a bridge, an oracle committee, an attester-of-record. Ledgerline removes them.
+
+The same registry works for any provable earnings stream. Device revenue is the sharpest case
+because the risk model falls out of the physics.
 
 ## What it does
 
-1. A `Payer` on Ethereum Sepolia pays a worker and emits
-   `PaymentMade(worker, amount, period)`. The payer never touches Creditcoin, signs nothing here,
-   and bridges no token.
+1. The network settles the operator's revenue on Ethereum Sepolia, emitting
+   `PaymentMade(operator, amount, period)`. It never touches Creditcoin, signs nothing here, and
+   bridges no token.
 2. Anyone fetches an inclusion + continuity proof for that transaction and submits it to
    `IncomeRegistry.execute()` on Creditcoin.
 3. The `0x0FD2` precompile verifies the proof **synchronously, in the same transaction**. The
@@ -38,12 +40,16 @@ but then the credit decision rests on the committee. Ledgerline's entire premise
 can verify a borrower's foreign income without trusting the party that reports it — which is
 exactly and only what the `0x0FD2` precompile provides. Remove it and there is no product.
 
-## Income going quiet is the default signal
+## A node that stops earning has stopped working
 
-An unsecured line has no collateral to seize, so the risk model is cadence. `isCurrent()` freezes
-the line when the newest proven period ages past the stale window. This is not incidental — during
-development the registry correctly refused credit against a real, fully-proven six-payment history
-because those payments were six months old. The freeze is the underwriting.
+An unsecured line has no collateral to seize, so the risk model is cadence. For physical
+infrastructure that is not a proxy for default, it is a direct one: revenue stops when the hardware
+stops. `isCurrent()` freezes the line when the newest proven period ages past the stale window,
+which makes the credit line a liveness check on the device.
+
+This is not incidental. During development the registry accepted a real, fully-proven six-period
+history and `CreditLine` still returned a limit of zero, because that revenue was six months stale.
+The freeze fired before it was tested deliberately.
 
 ## Security inheritance
 
@@ -58,13 +64,15 @@ written after finding two flaws in the tutorial's `USCBase` and filed upstream a
 
 Two guards are specific to *creating money* rather than destroying it:
 
-- only the registered `Payer` can emit countable income — otherwise anyone deploys a contract that
-  emits `PaymentMade` for their own address and mints themselves a credit history
-- each `(worker, period)` pair counts exactly once, across all transactions — otherwise one payslip
-  is replayed into an unlimited limit
+- only the registered revenue source can emit countable earnings — otherwise anyone deploys a
+  contract that emits `PaymentMade` for their own address and mints themselves a revenue history
+- each `(operator, period)` pair counts exactly once, across all transactions — otherwise one
+  settlement is replayed into an unlimited limit
 
 ## Scope
 
-MVP, deliberately. One source chain, one payer, a single-lender pool, no interest, no term, no
-secondary market, no liquidation. The submission is the primitive: **foreign income, proven
-trustlessly, priced into unsecured credit.**
+MVP, deliberately. One source chain, one revenue source, a single-lender pool, no interest, no
+term, no secondary market, no liquidation. The submission is the primitive: **foreign revenue,
+proven trustlessly, priced into unsecured credit.**
+
+Track: **DePIN** — cross-chain data driving settlement and incentives across hardware networks.
