@@ -1,7 +1,7 @@
 # Ledgerline
 
-**A DePIN operator proves the revenue their hardware earns on another chain, and finances more
-hardware against it on Creditcoin. No collateral is posted, at any point.**
+**A DePIN operator proves the revenue their hardware earns across several networks, on another
+chain, and finances more hardware against the aggregate. No collateral is posted, at any point.**
 
 Built for BUIDL CTC 2026 Fall on Creditcoin's Attestcoin Protocol.
 
@@ -14,8 +14,13 @@ collateralised design they cannot get it, because they hold nothing on the lendi
 What they do have is an earnings record. Moving that record across has always required trusting
 someone: a bridge, an oracle committee, an attester-of-record. Ledgerline removes them.
 
-The same registry works for any provable earnings stream. Device revenue is the sharpest case
-because the risk model falls out of the physics.
+And there is a harder version of the problem. An operator runs a hotspot on one network, a storage
+node on another, a sensor on a third. **Each network sees only its own slice**, so none of them can
+underwrite the operator — to every individual network they look unbankable, while in aggregate they
+are obviously good for it.
+
+No single network can fix this, because no single network can see the others. Creditcoin can,
+because every stream is proven into the same registry.
 
 ## What it does
 

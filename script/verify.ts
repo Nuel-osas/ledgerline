@@ -90,10 +90,17 @@ async function main() {
   // 5. every counted period is individually provable on the source chain
   const sig = ethers.id('PaymentMade(address,uint256,uint64)');
   const head = await src.getBlockNumber();
-  const logs = await src.getLogs({
-    fromBlock: head - 40000, toBlock: head,
-    topics: [sig, ethers.zeroPadValue(worker, 32)],
-  });
+  // Public RPCs reject an unfiltered getLogs, so query each registered source.
+  const sources = [process.env.PAYER_ADDRESS!, process.env.PAYER2_ADDRESS!, process.env.PAYER3_ADDRESS!]
+    .filter(Boolean);
+  const logs: any[] = [];
+  for (const addr of sources) {
+    const found = await src.getLogs({
+      address: addr, fromBlock: head - 40000, toBlock: head,
+      topics: [sig, ethers.zeroPadValue(worker, 32)],
+    });
+    logs.push(...found);
+  }
   let counted = 0;
   for (const l of logs) {
     const [, period] = ethers.AbiCoder.defaultAbiCoder().decode(['uint256', 'uint64'], l.data);
