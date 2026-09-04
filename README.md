@@ -93,10 +93,28 @@ Calling the faucet still costs a little gas, so from a completely empty wallet u
 
 Everything above can be re-checked without trusting this repository:
 
-    yarn verify
+    yarn verify      # re-reads every claim from public RPCs
+    yarn preflight   # is the live demo actually completable by a stranger?
 
 It re-reads every claim from public RPCs, including the on-chain transaction where a replayed
 settlement was rejected.
+
+## Settlement authority
+
+`pay()` is restricted to the network's paymaster, and an operator cannot be paid by
+themselves. This is deliberately *not* permissionless, unlike proof submission.
+
+The distinction matters. Submitting a proof is costless to get wrong: the chain
+re-verifies it, so anyone may do it. Emitting a settlement **mints credit history**.
+An earlier version had an open `pay()` — the comment in the source called it a
+feature — and a wallet could self-transfer tokens in a loop, netting to zero, and
+manufacture an earnings record across three networks for the price of gas,
+collecting the diversification premium on the way. It was found by running the
+attack, not by reading the code.
+
+The invariant it should have been built to, stated properly: **credit may only be
+minted by a fact whose creation was authorised by the party bearing the economic
+loss.**
 
 ## Scope
 
