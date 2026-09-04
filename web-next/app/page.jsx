@@ -15,6 +15,7 @@ export default function Home() {
             <a href="#how">How it works</a>
             <a href="#proof">Proof</a>
             <a href="#risk">Risk</a>
+            <a className="btn btn--accent" href="app/">Open the app</a>
             <a className="btn" href="https://github.com/Nuel-osas/ledgerline">Code</a>
           </div>
         </div>
@@ -30,8 +31,8 @@ export default function Home() {
             against it. No collateral is posted, at any point.
           </p>
           <div className="cta">
-            <a className="btn btn--accent" href="#proof">See the live position</a>
-            <a className="btn" href="https://github.com/Nuel-osas/ledgerline">Read the contracts</a>
+            <a className="btn btn--accent" href="app/">Prove revenue, live</a>
+            <a className="btn" href="#proof">See the live position</a>
           </div>
         </div>
 

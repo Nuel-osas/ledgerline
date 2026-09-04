@@ -25,6 +25,13 @@ export const CONTRACTS = {
 export const SEPOLIA_RPC = 'https://ethereum-sepolia-rpc.publicnode.com';
 export const PROVER = 'https://prover.cc3-testnet.creditcoin.network';
 export const CHAIN_KEY = 1;
+export const PAYER_ABI = [
+  { type: 'event', name: 'PaymentMade', inputs: [
+      { name: 'worker', type: 'address', indexed: true },
+      { name: 'amount', type: 'uint256' },
+      { name: 'period', type: 'uint64' } ] },
+];
+
 export const DEMO_WORKER = '0xEbF0F7718A5f42BdCE7F11B2982D550D44f180b4';
 
 export const REGISTRY_ABI = [
@@ -47,6 +54,8 @@ export const REGISTRY_ABI = [
       { name: 'siblings', type: 'tuple[]', components: [{ name: 'hash', type: 'bytes32' }, { name: 'isLeft', type: 'bool' }] },
       { name: 'lowerEndpointDigest', type: 'bytes32' }, { name: 'continuityRoots', type: 'bytes32[]' },
     ], outputs: [{ type: 'bool' }] },
+  { type: 'function', name: 'periodCounted', stateMutability: 'view',
+    inputs: [{ type: 'address' }, { type: 'uint64' }], outputs: [{ type: 'bool' }] },
   { type: 'event', name: 'IncomeAttested', inputs: [
       { name: 'worker', type: 'address', indexed: true }, { name: 'amount', type: 'uint256' },
       { name: 'period', type: 'uint64' }, { name: 'totalReceived', type: 'uint256' },
