@@ -69,6 +69,30 @@ Two guards are specific to *creating money* rather than destroying it:
 - each `(operator, period)` pair counts exactly once, across all transactions — otherwise one
   settlement is replayed into an unlimited limit
 
+## Testing it yourself
+
+Proof submission is permissionless, which is only true in practice if a stranger can afford the
+transaction. So there is a faucet.
+
+| Contract | Chain | Address |
+|---|---|---|
+| Faucet | Creditcoin CC3 | `0x751FD2650551FBecf2CEB3a1DAD32F2DEF63e07C` |
+
+Open the [app](https://nuel-osas.github.io/ledgerline/app/), connect a wallet, and claim 0.5 CTC
+(6 hour cooldown, ~4000 claims funded). Then prove any unproven settlement in the table: you pay
+the gas, the registry accepts the proof from you rather than from us, and the operator's credit
+limit rises.
+
+Calling the faucet still costs a little gas, so from a completely empty wallet use the
+[Creditcoin Discord faucet](https://discord.gg/creditcoin) once, then come back.
+
+Everything above can be re-checked without trusting this repository:
+
+    yarn verify
+
+It re-reads every claim from public RPCs, including the on-chain transaction where a replayed
+settlement was rejected.
+
 ## Scope
 
 MVP, deliberately. One source chain, one revenue source, a single-lender pool, no interest, no

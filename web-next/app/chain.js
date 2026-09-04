@@ -16,6 +16,7 @@ export const creditcoinCC3 = defineChain({
 });
 
 export const CONTRACTS = {
+  faucet: '0x751FD2650551FBecf2CEB3a1DAD32F2DEF63e07C',   // CC3, gas for testers
   payer: '0x4371bD116de786f44D0b0f144c7F5606757A088B',      // Sepolia
   registry: '0x58Fde1CaF19e98690Bf301C349ddf4e0aBb6f875',   // CC3
   creditLine: '0x31f169EC7C69144aEbB04091925d66De1FD4bDdb', // CC3
@@ -25,6 +26,12 @@ export const CONTRACTS = {
 export const SEPOLIA_RPC = 'https://ethereum-sepolia-rpc.publicnode.com';
 export const PROVER = 'https://prover.cc3-testnet.creditcoin.network';
 export const CHAIN_KEY = 1;
+export const FAUCET_ABI = [
+  { type: 'function', name: 'claim', stateMutability: 'nonpayable', inputs: [], outputs: [] },
+  { type: 'function', name: 'dripAmount', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256' }] },
+  { type: 'function', name: 'claimableIn', stateMutability: 'view', inputs: [{ type: 'address' }], outputs: [{ type: 'uint256' }] },
+];
+
 export const PAYER_ABI = [
   { type: 'event', name: 'PaymentMade', inputs: [
       { name: 'worker', type: 'address', indexed: true },

@@ -6,7 +6,7 @@ import { useAccount, useChainId, usePublicClient, useSwitchChain, useWalletClien
 import { createPublicClient, decodeEventLog, formatEther, http, parseAbiItem, parseEther } from 'viem';
 import { sepolia } from 'wagmi/chains';
 import {
-  CHAIN_KEY, CONTRACTS, DEMO_WORKER, LINE_ABI, PROVER, REGISTRY_ABI, SEPOLIA_RPC, creditcoinCC3,
+  CHAIN_KEY, CONTRACTS, DEMO_WORKER, FAUCET_ABI, LINE_ABI, PROVER, REGISTRY_ABI, SEPOLIA_RPC, creditcoinCC3,
 } from '../chain';
 
 const sepoliaClient = createPublicClient({ chain: sepolia, transport: http(SEPOLIA_RPC) });
@@ -31,6 +31,7 @@ export default function Console() {
   const [settlements, setSettlements] = useState([]);
   const [busy, setBusy] = useState(null);
   const [feed, setFeed] = useState([]);
+  const [gas, setGas] = useState(null);
 
   const log = useCallback((msg, kind = 'info') => {
     setFeed((f) => [...f.slice(-40), { msg, kind, t: new Date().toLocaleTimeString() }]);
@@ -47,8 +48,9 @@ export default function Console() {
         ccClient.readContract({ address: CONTRACTS.creditLine, abi: LINE_ABI, functionName: 'outstanding', args: [operator] }),
       ]);
       setRecord(rec); setLimit(lim); setAvailable(avail); setOutstanding(owed);
+      if (address) setGas(await ccClient.getBalance({ address }));
     } catch { /* transient rpc */ }
-  }, [ccClient, operator]);
+  }, [ccClient, operator, address]);
 
   // ---- discover the operator's settlements on the source chain ----------
   const discover = useCallback(async () => {
@@ -140,6 +142,25 @@ export default function Console() {
     finally { setBusy(null); }
   };
 
+  // ---- gas, so a stranger can afford to submit a proof --------------------
+  const claimGas = async () => {
+    if (!walletClient) return;
+    setBusy('gas');
+    try {
+      const hash = await walletClient.writeContract({
+        address: CONTRACTS.faucet, abi: FAUCET_ABI, functionName: 'claim',
+        args: [], chain: creditcoinCC3, gas: 120_000n,
+      });
+      await ccClient.waitForTransactionReceipt({ hash });
+      log('Claimed 0.5 CTC for gas. You can now submit a proof.', 'kill');
+      refresh();
+    } catch (e) {
+      const m = e?.shortMessage ?? e?.message ?? String(e);
+      log(`Faucet: ${m}`, /cooldown/i.test(m) ? 'warn' : 'err');
+    } finally { setBusy(null); }
+  };
+
+  const lowGas = gas != null && gas < 100_000_000_000_000_000n; // < 0.1 CTC
   const unproven = settlements.filter((s) => !s.proven);
 
   return (
@@ -179,6 +200,25 @@ export default function Console() {
             <code>{creditcoinCC3.id}</code>, gas in <code>{creditcoinCC3.nativeCurrency.symbol}</code>).{' '}
             <button className="btn btn--accent" style={{ marginLeft: 8, height: 32 }}
               onClick={() => switchChain({ chainId: creditcoinCC3.id })}>Switch network</button>
+          </div>
+        )}
+
+        {isConnected && !wrongNetwork && (
+          <div className="note" style={lowGas ? { borderLeftColor: 'var(--warn)' } : undefined}>
+            <b>Gas:</b> your wallet holds {gas != null ? fmt(gas) : '—'} CTC.{' '}
+            {lowGas
+              ? 'Too little to submit a proof. '
+              : 'Enough to submit a proof. '}
+            <button className="btn" style={{ height: 30, padding: '0 12px', marginLeft: 6 }}
+              onClick={claimGas} disabled={busy === 'gas'}>
+              {busy === 'gas' ? 'Claiming…' : 'Claim 0.5 CTC'}
+            </button>
+            <span style={{ display: 'block', marginTop: 8, fontSize: 13, color: 'var(--text-3)' }}>
+              The faucet tops up, but it still costs a little gas to call. From a completely empty
+              wallet, use the{' '}
+              <a href="https://discord.gg/creditcoin" target="_blank" rel="noreferrer">Creditcoin Discord faucet</a>{' '}
+              first, then come back.
+            </span>
           </div>
         )}
 
