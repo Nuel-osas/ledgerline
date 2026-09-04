@@ -1,0 +1,6 @@
+{
+  "name": "ledgerline-relay",
+  "private": true,
+  "type": "module",
+  "dependencies": { "ethers": "^6.17.0" }
+}

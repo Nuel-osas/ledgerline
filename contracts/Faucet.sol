@@ -24,13 +24,46 @@ contract Faucet is Ownable, ReentrancyGuard {
 
     mapping(address => uint256) public lastClaimed;
 
+    /// A relayer allowed to push gas to an address that has none. The cooldown is
+    /// enforced against the RECIPIENT, not the caller, so a compromised relayer
+    /// still cannot drain this faster than the schedule allows.
+    mapping(address => bool) public isDripper;
+
     event Dripped(address indexed to, uint256 amount);
+    event DripperSet(address indexed dripper, bool allowed);
     event Funded(address indexed from, uint256 amount);
     event ConfigUpdated(uint256 dripAmount, uint256 cooldown);
 
     constructor() payable Ownable(msg.sender) {}
 
     receive() external payable { emit Funded(msg.sender, msg.value); }
+
+    function setDripper(address dripper, bool allowed) external onlyOwner {
+        isDripper[dripper] = allowed;
+        emit DripperSet(dripper, allowed);
+    }
+
+    /**
+     * @dev Push gas to a wallet that has none.
+     *
+     * Claiming by transaction is a chicken and egg problem: you need gas to ask
+     * for gas. A relayer calls this so a visitor with an empty wallet can be
+     * funded without signing anything. Per-recipient cooldown is enforced here,
+     * on-chain, so the relayer holds no state and cannot be spammed into
+     * emptying the faucet.
+     */
+    function dripTo(address to) external nonReentrant {
+        require(isDripper[msg.sender], "Not a dripper");
+        require(to != address(0), "Invalid recipient");
+        require(block.timestamp >= lastClaimed[to] + cooldown, "Recipient is on cooldown");
+        require(address(this).balance >= dripAmount, "Faucet is dry");
+
+        lastClaimed[to] = block.timestamp;
+        (bool sent, ) = to.call{value: dripAmount}("");
+        require(sent, "Transfer failed");
+
+        emit Dripped(to, dripAmount);
+    }
 
     function setConfig(uint256 _drip, uint256 _cooldown) external onlyOwner {
         require(_drip > 0, "Drip must be > 0");

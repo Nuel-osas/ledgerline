@@ -7,7 +7,7 @@ import { createPublicClient, decodeEventLog, formatEther, http, parseAbiItem, pa
 import { sepolia } from 'wagmi/chains';
 import {
   CHAIN_KEY, CONTRACTS, DEMO_WORKER, FAUCET_ABI, LINE_ABI, PROVER, REGISTRY_ABI, SEPOLIA_RPC,
-  TEST_OPERATOR_KEY, creditcoinCC3,
+  RELAY, TEST_OPERATOR_KEY, creditcoinCC3,
 } from '../chain';
 
 const sepoliaClient = createPublicClient({ chain: sepolia, transport: http(SEPOLIA_RPC) });
@@ -154,20 +154,23 @@ export default function Console() {
   };
 
   // ---- gas, so a stranger can afford to submit a proof --------------------
+  // Asking a wallet to sign for gas is a chicken and egg problem, so a relayer
+  // pushes it instead. The visitor signs nothing and needs no starting balance.
   const claimGas = async () => {
-    if (!walletClient) return;
+    if (!address) return;
     setBusy('gas');
     try {
-      const hash = await walletClient.writeContract({
-        address: CONTRACTS.faucet, abi: FAUCET_ABI, functionName: 'claim',
-        args: [], chain: creditcoinCC3, gas: 120_000n,
+      log('Requesting gas. No signature needed for this step.', 'step');
+      const res = await fetch(RELAY, {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ address }),
       });
-      await ccClient.waitForTransactionReceipt({ hash });
-      log('Claimed 0.5 CTC for gas. You can now submit a proof.', 'kill');
-      refresh();
+      const j = await res.json();
+      if (!res.ok) throw new Error(j.error ?? `relayer returned ${res.status}`);
+      log(`Received ${j.amount} CTC. You can now submit a proof yourself.`, 'kill');
+      setTimeout(refresh, 2500);
     } catch (e) {
-      const m = e?.shortMessage ?? e?.message ?? String(e);
-      log(`Faucet: ${m}`, /cooldown/i.test(m) ? 'warn' : 'err');
+      log(`Gas: ${e.message}`, /cooldown|enough gas/i.test(e.message) ? 'warn' : 'err');
     } finally { setBusy(null); }
   };
 
@@ -217,18 +220,15 @@ export default function Console() {
         {isConnected && !wrongNetwork && (
           <div className="note" style={lowGas ? { borderLeftColor: 'var(--warn)' } : undefined}>
             <b>Gas:</b> your wallet holds {gas != null ? fmt(gas) : '—'} CTC.{' '}
-            {lowGas
-              ? 'Too little to submit a proof. '
-              : 'Enough to submit a proof. '}
-            <button className="btn" style={{ height: 30, padding: '0 12px', marginLeft: 6 }}
+            {lowGas ? 'Too little to submit a proof. ' : 'Enough to submit a proof. '}
+            <button className="btn btn--accent" style={{ height: 30, padding: '0 12px', marginLeft: 6 }}
               onClick={claimGas} disabled={busy === 'gas'}>
-              {busy === 'gas' ? 'Claiming…' : 'Claim 0.5 CTC'}
+              {busy === 'gas' ? 'Sending…' : 'Send me gas'}
             </button>
             <span style={{ display: 'block', marginTop: 8, fontSize: 13, color: 'var(--text-3)' }}>
-              The faucet tops up, but it still costs a little gas to call. From a completely empty
-              wallet, use the{' '}
-              <a href="https://discord.gg/creditcoin" target="_blank" rel="noreferrer">Creditcoin Discord faucet</a>{' '}
-              first, then come back.
+              A relayer pushes it to you: you sign nothing and need no starting balance, because
+              needing gas to ask for gas would defeat the point. The cooldown is enforced on-chain
+              against the recipient, so the relayer holds no state.
             </span>
           </div>
         )}

@@ -24,7 +24,7 @@ export const TEST_OPERATOR_KEY =
   '0x4ba1f89b3fc3a0c0641070c4f30e8d1084ecb6ce85dc5e8e08f0785b61a24b82';
 
 export const CONTRACTS = {
-  faucet: '0x751FD2650551FBecf2CEB3a1DAD32F2DEF63e07C',   // CC3, gas for testers
+  faucet: '0xCEA6067E9530e11f914A524Cc1e63F3C441b4E25',   // CC3, gas for testers
   payer: '0x4371bD116de786f44D0b0f144c7F5606757A088B',      // Sepolia, wireless
   payer2: '0xb6a36a6aaA7c73E3AA83004600EB20AC761317a4',     // Sepolia, storage
   payer3: '0xaA6F1ab69B78AA22FC48dD860296Fb752bd6c56A',     // Sepolia, sensors
@@ -34,6 +34,7 @@ export const CONTRACTS = {
 };
 
 export const SEPOLIA_RPC = 'https://ethereum-sepolia-rpc.publicnode.com';
+export const RELAY = 'https://relay-azure-alpha.vercel.app/api/drip';
 export const PROVER = 'https://prover.cc3-testnet.creditcoin.network';
 export const CHAIN_KEY = 1;
 export const FAUCET_ABI = [
