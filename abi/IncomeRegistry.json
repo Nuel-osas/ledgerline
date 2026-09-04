@@ -181,6 +181,11 @@
             "internalType": "uint8"
           },
           {
+            "name": "periodsCovered",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
             "name": "exists",
             "type": "bool",
             "internalType": "bool"
@@ -371,6 +376,11 @@
         "name": "networkCount",
         "type": "uint8",
         "internalType": "uint8"
+      },
+      {
+        "name": "periodsCovered",
+        "type": "uint64",
+        "internalType": "uint64"
       },
       {
         "name": "exists",

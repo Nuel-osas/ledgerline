@@ -56,18 +56,32 @@ async function main() {
   const rec = await registry.getRecord(worker);
   const avg = await registry.averagePayment(worker);
   check(rec.exists && rec.paymentCount >= 12n,
-    `Income record: ${ethers.formatEther(rec.totalReceived)} proven over ${rec.paymentCount} periods`,
-    `average ${ethers.formatEther(avg)} per period, first ${new Date(Number(rec.firstPeriod) * 1000).toISOString().slice(0, 10)}, last ${new Date(Number(rec.lastPeriod) * 1000).toISOString().slice(0, 10)}`);
+    `Income record: ${ethers.formatEther(rec.totalReceived)} proven across ${rec.networkCount} networks`,
+    `${rec.paymentCount} settlements over ${rec.periodsCovered} periods, first ${new Date(Number(rec.firstPeriod) * 1000).toISOString().slice(0, 10)}, last ${new Date(Number(rec.lastPeriod) * 1000).toISOString().slice(0, 10)}`);
+
+  // the diversification premium is real, not decorative
+  const nets: string[] = [];
+  const n = Number(await registry.networkCount());
+  for (let i = 0; i < n; i++) {
+    const addr = await registry.networkList(i);
+    const meta = await registry.networks(addr);
+    const earned = await registry.earnedOn(worker, addr);
+    if (earned > 0n) nets.push(`${meta.name} ${ethers.formatEther(earned)}`);
+  }
+  check(nets.length >= 2,
+    `Revenue is proven across ${nets.length} independent networks`,
+    nets.join(' · '));
 
   // 4. the credit derives from that record and nothing else
   const [limit, avail, owed, current] = await Promise.all([
     line.limitOf(worker), line.available(worker), line.outstanding(worker), line.isCurrent(worker),
   ]);
-  const mult: bigint = BigInt(await line.multiplierBps(rec.paymentCount));
-  const expected: bigint = (BigInt(avg) * mult) / 10_000n;
+  const mult: bigint = BigInt(await line.multiplierBps(rec.periodsCovered));
+  const div: bigint = BigInt(await line.diversityBps(rec.networkCount));
+  const expected: bigint = (BigInt(avg) * (mult + div)) / 10_000n;
   check(limit === expected,
-    `Credit limit ${ethers.formatEther(limit)} is derived from proven income`,
-    `average ${ethers.formatEther(avg)} x ${(Number(mult) / 100).toFixed(0)}% = ${ethers.formatEther(expected)}`);
+    `Credit limit ${ethers.formatEther(limit)} is derived from proven revenue`,
+    `run-rate ${ethers.formatEther(avg)}/period x (${Number(mult) / 100}% history + ${Number(div) / 100}% diversification) = ${ethers.formatEther(expected)}`);
   check(current, 'Income record is current, so the line is not frozen',
     `last proven period is inside the stale window`);
   check(owed > 0n, `Operator has drawn ${ethers.formatEther(owed)} against it`,
@@ -77,13 +91,13 @@ async function main() {
   const sig = ethers.id('PaymentMade(address,uint256,uint64)');
   const head = await src.getBlockNumber();
   const logs = await src.getLogs({
-    address: process.env.PAYER_ADDRESS!, fromBlock: head - 40000, toBlock: head,
+    fromBlock: head - 40000, toBlock: head,
     topics: [sig, ethers.zeroPadValue(worker, 32)],
   });
   let counted = 0;
   for (const l of logs) {
     const [, period] = ethers.AbiCoder.defaultAbiCoder().decode(['uint256', 'uint64'], l.data);
-    if (await registry.periodCounted(worker, period)) counted++;
+    if (await registry.periodCountedBy(worker, l.address, period)) counted++;
   }
   check(counted === Number(rec.paymentCount),
     `All ${counted} counted periods trace to a real Sepolia PaymentMade log`,

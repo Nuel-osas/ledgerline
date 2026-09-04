@@ -243,6 +243,11 @@ export default function Console() {
                 <div className="row"><dt>Periods proven</dt><dd>{record ? String(record.paymentCount) : '—'}</dd></div>
                 <div className="row"><dt>Not yet proven</dt>
                   <dd className={unproven.length ? '' : 'good'}>{unproven.length}</dd></div>
+                <div className="row"><dt>Earning run-rate</dt>
+                  <dd className="good">{record && record.periodsCovered > 0n
+                    ? `${fmt(record.totalReceived / record.periodsCovered)} / period` : '—'}</dd></div>
+                <div className="row"><dt>Periods covered</dt>
+                  <dd>{record ? String(record.periodsCovered) : '—'}</dd></div>
                 <div className="row"><dt>Networks paying them</dt>
                   <dd className={record && record.networkCount > 1 ? 'good' : ''}>
                     {record ? String(record.networkCount) : '—'}
@@ -327,7 +332,8 @@ export default function Console() {
       </main>
 
       <section style={{ borderTop: 0, paddingTop: 0 }}>
-        <div className="note">
+        <div className="wrap">
+        <div className="note" style={{ maxWidth: '70ch' }}>
           <b>Try every feature, including the draw.</b>
           <p style={{ marginTop: 8, fontSize: 14, lineHeight: 1.6 }}>
             Proving revenue works from any wallet, because submission is permissionless. Drawing is
@@ -343,6 +349,7 @@ export default function Console() {
             Import it into MetaMask (account menu &rarr; Import Account), reconnect, and the draw
             button becomes live. Never reuse a published key for anything real.
           </p>
+        </div>
         </div>
       </section>
 

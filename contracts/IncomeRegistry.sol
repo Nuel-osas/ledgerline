@@ -30,6 +30,7 @@ contract IncomeRegistry is Ownable, AttestBase {
         uint64 lastPeriod;
         uint64 lastAttestedBlock;
         uint8 networkCount;      // how many distinct networks have paid them
+        uint64 periodsCovered;   // distinct pay periods, regardless of network
         bool exists;
     }
 
@@ -52,6 +53,7 @@ contract IncomeRegistry is Ownable, AttestBase {
     /// Per-network totals, so a lender can see concentration rather than just a sum.
     mapping(address => mapping(address => uint256)) public earnedOn;
     mapping(address => mapping(address => bool)) private _seenNetwork;
+    mapping(address => mapping(uint64 => bool)) private _seenPeriod;
 
     event NetworkRegistered(address indexed source, string name);
     event IncomeAttested(
@@ -81,10 +83,19 @@ contract IncomeRegistry is Ownable, AttestBase {
         return false;
     }
 
+    /**
+     * @dev Earnings per pay period, across every network combined.
+     *
+     * Deliberately divided by distinct PERIODS, not by settlement count. An
+     * operator paid 500 by one network and 180 by another in the same fortnight
+     * earned 680 that fortnight; they did not earn "an average of 340". Dividing
+     * by settlements would punish an operator for adding a smaller second income
+     * stream, which is backwards: the second stream makes them safer, not poorer.
+     */
     function averagePayment(address operator) public view returns (uint256) {
         IncomeRecord memory r = records[operator];
-        if (r.paymentCount == 0) return 0;
-        return r.totalReceived / r.paymentCount;
+        if (r.periodsCovered == 0) return 0;
+        return r.totalReceived / r.periodsCovered;
     }
 
     /// @dev Applies every PaymentMade emitted by a REGISTERED network in the proven
@@ -133,6 +144,10 @@ contract IncomeRegistry is Ownable, AttestBase {
         if (!_seenNetwork[operator][source]) {
             _seenNetwork[operator][source] = true;
             r.networkCount += 1;
+        }
+        if (!_seenPeriod[operator][period]) {
+            _seenPeriod[operator][period] = true;
+            r.periodsCovered += 1;
         }
 
         earnedOn[operator][source] += amount;

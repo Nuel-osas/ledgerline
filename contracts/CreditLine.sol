@@ -108,7 +108,9 @@ contract CreditLine is Ownable, ReentrancyGuard {
         IncomeRegistry.IncomeRecord memory r = registry.getRecord(borrower);
         if (!r.exists || !isCurrent(borrower)) return 0;
         uint256 avg = registry.averagePayment(borrower);
-        uint256 bps = multiplierBps(r.paymentCount) + diversityBps(r.networkCount);
+        // History ramps on periods actually covered. Two networks paying in the
+        // same fortnight is one period of history, not two.
+        uint256 bps = multiplierBps(r.periodsCovered) + diversityBps(r.networkCount);
         return (avg * bps) / 10_000;
     }
 

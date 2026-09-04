@@ -28,8 +28,8 @@ export const CONTRACTS = {
   payer: '0x4371bD116de786f44D0b0f144c7F5606757A088B',      // Sepolia, wireless
   payer2: '0xb6a36a6aaA7c73E3AA83004600EB20AC761317a4',     // Sepolia, storage
   payer3: '0xaA6F1ab69B78AA22FC48dD860296Fb752bd6c56A',     // Sepolia, sensors
-  registry: '0xEcA46BE9E096c739C718Ce4E976297c0625b9ab4',   // CC3, multi-network
-  creditLine: '0x44A0319b69D963B04493e1edb6ae331f1c051163', // CC3, prices diversification
+  registry: '0xDcd6ba44474F461A4cEF01F824B05DA582B763f9',   // CC3, multi-network
+  creditLine: '0xa2f7fe0dEBd6b341a57D7CEBa5b629BC437CEfeA', // CC3, prices diversification
   creditToken: '0x99D09557A6b50DEF18666E75eaABC1DC32d43555',// CC3
 };
 
@@ -61,6 +61,7 @@ export const REGISTRY_ABI = [
       { name: 'lastPeriod', type: 'uint64' },
       { name: 'lastAttestedBlock', type: 'uint64' },
       { name: 'networkCount', type: 'uint8' },
+      { name: 'periodsCovered', type: 'uint64' },
       { name: 'exists', type: 'bool' },
     ]}] },
   { type: 'function', name: 'averagePayment', stateMutability: 'view',
@@ -79,6 +80,8 @@ export const REGISTRY_ABI = [
     inputs: [{ type: 'address' }, { type: 'address' }], outputs: [{ type: 'uint256' }] },
   { type: 'function', name: 'periodCounted', stateMutability: 'view',
     inputs: [{ type: 'address' }, { type: 'uint64' }], outputs: [{ type: 'bool' }] },
+  { type: 'function', name: 'periodCountedBy', stateMutability: 'view',
+    inputs: [{ type: 'address' }, { type: 'address' }, { type: 'uint64' }], outputs: [{ type: 'bool' }] },
   { type: 'event', name: 'IncomeAttested', inputs: [
       { name: 'worker', type: 'address', indexed: true }, { name: 'amount', type: 'uint256' },
       { name: 'period', type: 'uint64' }, { name: 'totalReceived', type: 'uint256' },
