@@ -6,7 +6,8 @@
     "attest": "tsx script/attest.ts",
     "status": "tsx script/status.ts",
     "draw": "tsx script/draw.ts",
-    "build": "forge build"
+    "build": "forge build",
+    "verify": "tsx script/verify.ts"
   },
   "dependencies": {
     "@gluwa/usc-contracts": "0.1.2",
@@ -15,5 +16,9 @@
     "dotenv": "17.4.2",
     "ethers": "^6.17.0"
   },
-  "devDependencies": { "tsx": "^4.22.4", "typescript": "6.0.2", "@types/node": "26.1.0" }
+  "devDependencies": {
+    "tsx": "^4.22.4",
+    "typescript": "6.0.2",
+    "@types/node": "26.1.0"
+  }
 }
