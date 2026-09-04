@@ -100,7 +100,8 @@ footer a:hover{color:var(--text-1)}
 .skip:focus{left:var(--gutter);top:8px;z-index:50;background:var(--panel);padding:8px 12px;border:1px solid var(--accent)}
 
 /* ---------- guided first run ---------- */
-.onboard{background:var(--panel);border:1px solid var(--line);margin:var(--s6) 0 var(--s7);box-shadow:var(--shadow-1)}
+.onboard{background:var(--panel);border:1px solid var(--line);margin:var(--s6) 0 var(--s7);
+  padding:0;border-top:1px solid var(--line);box-shadow:var(--shadow-1)}
 .onboard__head{display:flex;align-items:center;justify-content:space-between;
   padding:var(--s4) var(--s5);border-bottom:1px solid var(--line-subtle);background:var(--panel-hi)}
 .onboard__head h2{font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);margin:0}
