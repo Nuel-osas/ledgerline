@@ -36,6 +36,25 @@
   },
   {
     "type": "function",
+    "name": "diversityBps",
+    "inputs": [
+      {
+        "name": "networkCount",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
     "name": "draw",
     "inputs": [
       {

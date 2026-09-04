@@ -73,6 +73,27 @@ contract CreditLine is Ownable, ReentrancyGuard {
         return (uint256(paymentCount) - 1) * 2_500;
     }
 
+    /**
+     * @dev Diversification bonus, in basis points.
+     *
+     * An operator earning 500 a period from one network and one earning 500 a
+     * period across three are not the same credit. The first has a single point
+     * of failure: that network degrades, changes its reward curve, or goes down,
+     * and 100% of the income stops. The second keeps paying.
+     *
+     * No single network can price this, because no single network can see the
+     * others. Creditcoin can, because every stream is proven here.
+     *
+     *   1 network  -> +0
+     *   2 networks -> +1500  (15%)
+     *   3+         -> +3000  (30%)
+     */
+    function diversityBps(uint8 networkCount) public pure returns (uint256) {
+        if (networkCount <= 1) return 0;
+        if (networkCount == 2) return 1_500;
+        return 3_000;
+    }
+
     /// @dev True when the last proven payment is recent enough to still count.
     function isCurrent(address borrower) public view returns (bool) {
         IncomeRegistry.IncomeRecord memory r = registry.getRecord(borrower);
@@ -80,12 +101,15 @@ contract CreditLine is Ownable, ReentrancyGuard {
         return block.timestamp <= uint256(r.lastPeriod) + stalePeriodSeconds;
     }
 
-    /// @dev The borrower's limit, derived purely from proven foreign income.
+    /// @dev The borrower's limit, derived purely from proven foreign income:
+    /// how much they earn, how long they have earned it, and across how many
+    /// independent networks.
     function limitOf(address borrower) public view returns (uint256) {
         IncomeRegistry.IncomeRecord memory r = registry.getRecord(borrower);
         if (!r.exists || !isCurrent(borrower)) return 0;
         uint256 avg = registry.averagePayment(borrower);
-        return (avg * multiplierBps(r.paymentCount)) / 10_000;
+        uint256 bps = multiplierBps(r.paymentCount) + diversityBps(r.networkCount);
+        return (avg * bps) / 10_000;
     }
 
     function outstanding(address borrower) public view returns (uint256) {

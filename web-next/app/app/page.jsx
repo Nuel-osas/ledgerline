@@ -6,7 +6,8 @@ import { useAccount, useChainId, usePublicClient, useSwitchChain, useWalletClien
 import { createPublicClient, decodeEventLog, formatEther, http, parseAbiItem, parseEther } from 'viem';
 import { sepolia } from 'wagmi/chains';
 import {
-  CHAIN_KEY, CONTRACTS, DEMO_WORKER, FAUCET_ABI, LINE_ABI, PROVER, REGISTRY_ABI, SEPOLIA_RPC, creditcoinCC3,
+  CHAIN_KEY, CONTRACTS, DEMO_WORKER, FAUCET_ABI, LINE_ABI, PROVER, REGISTRY_ABI, SEPOLIA_RPC,
+  TEST_OPERATOR_KEY, creditcoinCC3,
 } from '../chain';
 
 const sepoliaClient = createPublicClient({ chain: sepolia, transport: http(SEPOLIA_RPC) });
@@ -56,20 +57,30 @@ export default function Console() {
   const discover = useCallback(async () => {
     try {
       const head = await sepoliaClient.getBlockNumber();
-      const logs = await sepoliaClient.getLogs({
-        address: CONTRACTS.payer, event: PAYMENT_EVENT, args: { worker: operator },
-        fromBlock: head - 40000n > 0n ? head - 40000n : 0n, toBlock: head,
-      });
+      const sources = [
+        [CONTRACTS.payer, 'Wireless coverage'],
+        [CONTRACTS.payer2, 'Decentralised storage'],
+        [CONTRACTS.payer3, 'Environmental sensors'],
+      ];
+      const logs = [];
+      for (const [addr, net] of sources) {
+        const found = await sepoliaClient.getLogs({
+          address: addr, event: PAYMENT_EVENT, args: { worker: operator },
+          fromBlock: head - 40000n > 0n ? head - 40000n : 0n, toBlock: head,
+        });
+        found.forEach((l) => logs.push(Object.assign(l, { network: net, source: addr })));
+      }
       const rows = [];
       for (const l of logs) {
         const period = l.args.period;
         let proven = false;
         try {
           proven = await ccClient.readContract({
-            address: CONTRACTS.registry, abi: REGISTRY_ABI, functionName: 'periodCounted', args: [operator, period],
+            address: CONTRACTS.registry, abi: REGISTRY_ABI, functionName: 'periodCountedBy',
+            args: [operator, l.source, period],
           });
         } catch { /* ignore */ }
-        rows.push({ hash: l.transactionHash, block: l.blockNumber, amount: l.args.amount, period, proven });
+        rows.push({ hash: l.transactionHash, block: l.blockNumber, amount: l.args.amount, period, proven, network: l.network });
       }
       rows.sort((a, b) => Number(b.period - a.period));
       setSettlements(rows);
@@ -232,6 +243,10 @@ export default function Console() {
                 <div className="row"><dt>Periods proven</dt><dd>{record ? String(record.paymentCount) : '—'}</dd></div>
                 <div className="row"><dt>Not yet proven</dt>
                   <dd className={unproven.length ? '' : 'good'}>{unproven.length}</dd></div>
+                <div className="row"><dt>Networks paying them</dt>
+                  <dd className={record && record.networkCount > 1 ? 'good' : ''}>
+                    {record ? String(record.networkCount) : '—'}
+                  </dd></div>
                 <div className="row"><dt>Operator</dt><dd>{short(operator)}</dd></div>
               </dl>
             </div>
@@ -249,10 +264,17 @@ export default function Console() {
                 <div className="row"><dt>Drawn</dt><dd>{fmt(outstanding)} TST</dd></div>
                 <div className="row"><dt>Available</dt><dd className="good">{fmt(available)} TST</dd></div>
               </dl>
-              <button className="btn" style={{ marginTop: 'var(--s4)', width: '100%' }}
+              <button className="btn btn--accent" style={{ marginTop: 'var(--s4)', width: '100%' }}
                 onClick={draw} disabled={!isConnected || busy === 'draw'}>
-                {busy === 'draw' ? 'Drawing…' : 'Draw 50 (operator only)'}
+                {busy === 'draw' ? 'Drawing…' : 'Draw 50 against proven revenue'}
               </button>
+              {isConnected && address?.toLowerCase() !== operator.toLowerCase() && (
+                <p style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 'var(--s3)', lineHeight: 1.55 }}>
+                  Drawing is scoped to the borrower, by design. To exercise it, import the demo
+                  operator below: it is a throwaway testnet key published on purpose so every
+                  feature works for you.
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -266,12 +288,13 @@ export default function Console() {
           <div className="scroll-x">
             <table>
               <tbody>
-                <tr><th>Period</th><th>Amount</th><th>Sepolia tx</th><th>State</th><th /></tr>
+                <tr><th>Network</th><th>Period</th><th>Amount</th><th>Sepolia tx</th><th>State</th><th /></tr>
                 {settlements.length === 0 && (
-                  <tr><td colSpan={5} className="n">Reading the source chain…</td></tr>
+                  <tr><td colSpan={6} className="n">Reading the source chains…</td></tr>
                 )}
                 {settlements.map((s) => (
                   <tr key={s.hash}>
+                    <td className="n">{s.network}</td>
                     <td className="n">{day(s.period)}</td>
                     <td>{fmt(s.amount)} TST</td>
                     <td><a href={`https://sepolia.etherscan.io/tx/${s.hash}`} target="_blank" rel="noreferrer">{s.hash.slice(0, 14)}…</a></td>
@@ -302,6 +325,26 @@ export default function Console() {
           </div>
         </section>
       </main>
+
+      <section style={{ borderTop: 0, paddingTop: 0 }}>
+        <div className="note">
+          <b>Try every feature, including the draw.</b>
+          <p style={{ marginTop: 8, fontSize: 14, lineHeight: 1.6 }}>
+            Proving revenue works from any wallet, because submission is permissionless. Drawing is
+            scoped to the borrower, because credit belongs to whoever earned it. So that the
+            restriction does not stop you testing, here is the demo operator&rsquo;s key. It is a
+            throwaway on testnet and holds nothing of value anywhere.
+          </p>
+          <code style={{ display: 'block', marginTop: 10, padding: '10px 12px', background: 'var(--well)',
+            border: '1px solid var(--line)', fontSize: 12, wordBreak: 'break-all' }}>
+            {TEST_OPERATOR_KEY}
+          </code>
+          <p style={{ marginTop: 10, fontSize: 13, color: 'var(--text-3)', lineHeight: 1.6 }}>
+            Import it into MetaMask (account menu &rarr; Import Account), reconnect, and the draw
+            button becomes live. Never reuse a published key for anything real.
+          </p>
+        </div>
+      </section>
 
       <footer>
         <div className="wrap">

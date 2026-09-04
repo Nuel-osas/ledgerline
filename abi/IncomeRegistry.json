@@ -35,7 +35,31 @@
     "name": "averagePayment",
     "inputs": [
       {
-        "name": "worker",
+        "name": "operator",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "earnedOn",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "",
         "type": "address",
         "internalType": "address"
       }
@@ -115,7 +139,7 @@
     "name": "getRecord",
     "inputs": [
       {
-        "name": "worker",
+        "name": "operator",
         "type": "address",
         "internalType": "address"
       }
@@ -152,11 +176,72 @@
             "internalType": "uint64"
           },
           {
+            "name": "networkCount",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
             "name": "exists",
             "type": "bool",
             "internalType": "bool"
           }
         ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "networkCount",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "networkList",
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "networks",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "name",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "registered",
+        "type": "bool",
+        "internalType": "bool"
       }
     ],
     "stateMutability": "view"
@@ -178,6 +263,35 @@
     "type": "function",
     "name": "periodCounted",
     "inputs": [
+      {
+        "name": "operator",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "period",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "periodCountedBy",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
       {
         "name": "",
         "type": "address",
@@ -254,6 +368,11 @@
         "internalType": "uint64"
       },
       {
+        "name": "networkCount",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
         "name": "exists",
         "type": "bool",
         "internalType": "bool"
@@ -263,12 +382,17 @@
   },
   {
     "type": "function",
-    "name": "registerSourcePayer",
+    "name": "registerNetwork",
     "inputs": [
       {
-        "name": "payer",
+        "name": "source",
         "type": "address",
         "internalType": "address"
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "internalType": "string"
       }
     ],
     "outputs": [],
@@ -280,19 +404,6 @@
     "inputs": [],
     "outputs": [],
     "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "sourcePayer",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -312,7 +423,13 @@
     "name": "IncomeAttested",
     "inputs": [
       {
-        "name": "worker",
+        "name": "operator",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "source",
         "type": "address",
         "indexed": true,
         "internalType": "address"
@@ -346,6 +463,25 @@
   },
   {
     "type": "event",
+    "name": "NetworkRegistered",
+    "inputs": [
+      {
+        "name": "source",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
     "name": "OwnershipTransferred",
     "inputs": [
       {
@@ -356,19 +492,6 @@
       },
       {
         "name": "newOwner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "SourcePayerRegistered",
-    "inputs": [
-      {
-        "name": "payer",
         "type": "address",
         "indexed": true,
         "internalType": "address"
