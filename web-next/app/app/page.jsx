@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import Onboarding from './Onboarding';
 import { useAccount, useChainId, usePublicClient, useSwitchChain, useWalletClient } from 'wagmi';
 import { createPublicClient, decodeEventLog, formatEther, http, parseAbiItem, parseEther } from 'viem';
 import { sepolia } from 'wagmi/chains';
@@ -33,6 +34,7 @@ export default function Console() {
   const [busy, setBusy] = useState(null);
   const [feed, setFeed] = useState([]);
   const [gas, setGas] = useState(null);
+  const [provenThisSession, setProvenThisSession] = useState(false);
 
   const log = useCallback((msg, kind = 'info') => {
     setFeed((f) => [...f.slice(-40), { msg, kind, t: new Date().toLocaleTimeString() }]);
@@ -126,6 +128,7 @@ export default function Console() {
           }
         } catch { /* not ours */ }
       }
+      setProvenThisSession(true);
       await refresh(); await discover();
     } catch (e) {
       const m = e?.shortMessage || e?.details || e?.message || String(e);
@@ -216,6 +219,19 @@ export default function Console() {
               onClick={() => switchChain({ chainId: creditcoinCC3.id })}>Switch network</button>
           </div>
         )}
+
+        <Onboarding
+          connected={isConnected}
+          hasGas={!lowGas && gas != null}
+          provenThisSession={provenThisSession}
+          limit={limit}
+          isOperator={address?.toLowerCase() === operator.toLowerCase()}
+          unprovenCount={unproven.length}
+          busy={busy}
+          onGas={claimGas}
+          onProve={() => { const next = settlements.find((x) => !x.proven); if (next) prove(next); }}
+          onDraw={draw}
+        />
 
         {isConnected && !wrongNetwork && (
           <div className="note" style={lowGas ? { borderLeftColor: 'var(--warn)' } : undefined}>

@@ -25,11 +25,11 @@ export const TEST_OPERATOR_KEY =
 
 export const CONTRACTS = {
   faucet: '0xCEA6067E9530e11f914A524Cc1e63F3C441b4E25',   // CC3, gas for testers
-  payer: '0x4371bD116de786f44D0b0f144c7F5606757A088B',      // Sepolia, wireless
-  payer2: '0xb6a36a6aaA7c73E3AA83004600EB20AC761317a4',     // Sepolia, storage
-  payer3: '0xaA6F1ab69B78AA22FC48dD860296Fb752bd6c56A',     // Sepolia, sensors
-  registry: '0xDcd6ba44474F461A4cEF01F824B05DA582B763f9',   // CC3, multi-network
-  creditLine: '0xa2f7fe0dEBd6b341a57D7CEBa5b629BC437CEfeA', // CC3, prices diversification
+  payer: '0x8f9F22Da18c47FCE49D8b5F8B3B7F0D569036768',      // Sepolia, wireless
+  payer2: '0x8B2479D85e10Ba09f90e54ee66bf5603be11B63b',     // Sepolia, storage
+  payer3: '0x88ed2400079e1d9f1099832b33ab38c463dfC6d7',     // Sepolia, sensors
+  registry: '0xC2559b847D8f7724B0e9921F6317A68B7Cf9115F',   // CC3, multi-network
+  creditLine: '0x38D62C096Cbe76291bD835cB1e5AAfCF1A3D8698', // CC3, prices diversification
   creditToken: '0x99D09557A6b50DEF18666E75eaABC1DC32d43555',// CC3
 };
 

@@ -17,6 +17,20 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 contract Payer {
     using SafeERC20 for IERC20;
 
+    /// The network's settlement authority. A DePIN network pays its own operators;
+    /// a stranger does not get to declare that someone earned something.
+    ///
+    /// This is deliberately NOT permissionless, unlike proof submission. Submitting
+    /// a proof is costless to get wrong: the chain re-verifies it. Emitting a
+    /// settlement MINTS credit history, so an open pay() lets anyone self-transfer
+    /// tokens in a loop and manufacture an earnings record for the price of gas.
+    address public paymaster;
+
+    modifier onlyPaymaster() {
+        require(msg.sender == paymaster, "Only the network paymaster may settle");
+        _;
+    }
+
     /// @param worker  who was paid
     /// @param amount  how much, in token units
     /// @param period  the pay period this settles, as a unix timestamp truncated
@@ -31,16 +45,24 @@ contract Payer {
 
     constructor(address _token) {
         token = IERC20(_token);
+        paymaster = msg.sender;
+    }
+
+    function setPaymaster(address who) external onlyPaymaster {
+        require(who != address(0), "Invalid paymaster");
+        paymaster = who;
     }
 
     /**
-     * @dev Pay a worker for a period. Anyone may fund a payment — the payer is
-     * not privileged, because nothing about the credit decision depends on who
-     * sent it. What the registry on Creditcoin checks is that this contract
-     * emitted the event.
+     * @dev Settle a period's earnings to an operator.
+     *
+     * Restricted to the network's paymaster, and the operator may not be the
+     * paymaster: a self-transfer nets to zero, so an open pay() would let anyone
+     * loop tokens to themselves and mint an earnings history for free.
      */
-    function pay(address worker, uint256 amount, uint64 period) external {
+    function pay(address worker, uint256 amount, uint64 period) external onlyPaymaster {
         require(worker != address(0), "Invalid worker");
+        require(worker != msg.sender, "Paymaster cannot settle to itself");
         require(amount > 0, "Amount must be greater than 0");
         require(period > lastPeriodPaid[worker], "Period already paid");
 

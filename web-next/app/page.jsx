@@ -24,11 +24,11 @@ export default function Home() {
       <main id="main">
         <div className="wrap hero" id="top">
           <div className="kicker">BUIDL CTC 2026 · Attestcoin Protocol</div>
-          <h1>A node that earns is collateral, if you can prove it.</h1>
+          <h1>No DePIN network can underwrite its own operators.</h1>
           <p className="sub">
-            A DePIN operator earns revenue on one chain and has nothing to pledge on another. Ledgerline
-            proves that revenue across the gap with an Attestcoin receipt, and finances more hardware
-            against it. No collateral is posted, at any point.
+            Each network sees only what it pays you. Ledgerline proves an operator&rsquo;s earnings from
+            every network they run, into one place, and lends against the total. No collateral is posted,
+            at any point.
           </p>
           <div className="cta">
             <a className="btn btn--accent" href="app/">Prove revenue, live</a>
@@ -38,18 +38,18 @@ export default function Home() {
 
         <section id="problem">
           <div className="wrap">
-            <h2>Hardware that earns cannot borrow against what it earns.</h2>
+            <h2>Alone, every operator looks unbankable.</h2>
             <p className="lead">
-              A wireless hotspot, a solar meter, a storage node: each settles its revenue on whichever
-              chain its network runs on. To grow, the operator needs capital, and under any collateralised
-              design they cannot get it, because they hold nothing on the lending chain. What they have is
-              an earnings record, and moving that record across has always needed a trusted party: a
-              bridge, an oracle committee, an attester of record.
+              An operator runs a hotspot on one network, a storage node on another, a sensor on a third.
+              The wireless network sees the hotspot. The storage network sees the node. Neither sees the
+              other, and none of them see enough to lend against. To every individual network the operator
+              is a stranger with no collateral, while in aggregate they are obviously good for it.
             </p>
             <p className="lead">
-              Attestcoin removes that party. The lender verifies the device&rsquo;s foreign revenue
-              directly, without trusting the network that reported it, and without the operator moving a
-              single token.
+              No network can fix this by itself, because no network can see the others. Attestcoin can:
+              every stream is proven into one registry on Creditcoin, verified rather than reported, with
+              nothing bridged and no operator moving a token. Creditcoin becomes the only place an
+              operator&rsquo;s whole earning history exists.
             </p>
           </div>
         </section>
@@ -87,10 +87,11 @@ export default function Home() {
 
         <section id="proof">
           <div className="wrap">
-            <h2>An operator that held nothing, financing 500.</h2>
+            <h2>Three networks. One credit profile.</h2>
             <p className="lead">
-              A real position on live testnets. The operator posted no collateral on Creditcoin, on
-              Ethereum, or anywhere else. Twelve fortnightly settlements, proven one at a time.
+              A real position on live testnets. Wireless, storage and sensors, each settling separately on
+              Sepolia, each proven to Creditcoin one settlement at a time. The operator posted no
+              collateral anywhere.
             </p>
             <div className="cols">
               <div className="card">
@@ -98,13 +99,13 @@ export default function Home() {
                   <h3>Proven income</h3><span className="chip">Sepolia &rarr; CC3</span>
                 </div>
                 <div className="card__body">
-                  <span className="lbl">Revenue proven over 12 periods</span>
-                  <div className="metric">6,000<span className="u">TST</span></div>
+                  <span className="lbl">Proven across three networks</span>
+                  <div className="metric">3,900<span className="u">TST</span></div>
                   <dl className="rows">
-                    <div className="row"><dt>Settlements proven</dt><dd>12</dd></div>
-                    <div className="row"><dt>Average per period</dt><dd>500 TST</dd></div>
-                    <div className="row"><dt>Cadence</dt><dd>fortnightly</dd></div>
-                    <div className="row"><dt>Record current</dt><dd className="good">yes</dd></div>
+                    <div className="row"><dt>Wireless coverage</dt><dd>3,000 TST</dd></div>
+                    <div className="row"><dt>Decentralised storage</dt><dd>720 TST</dd></div>
+                    <div className="row"><dt>Environmental sensors</dt><dd>180 TST</dd></div>
+                    <div className="row"><dt>Run-rate</dt><dd className="good">390 / period</dd></div>
                   </dl>
                 </div>
               </div>
@@ -114,12 +115,12 @@ export default function Home() {
                 </div>
                 <div className="card__body">
                   <span className="lbl">Unsecured limit</span>
-                  <div className="metric good">625<span className="u">TST</span></div>
+                  <div className="metric good">604.5<span className="u">TST</span></div>
                   <dl className="rows">
                     <div className="row"><dt>Collateral posted</dt><dd>none</dd></div>
-                    <div className="row"><dt>Drawn</dt><dd>500 TST</dd></div>
-                    <div className="row"><dt>Available</dt><dd>125 TST</dd></div>
-                    <div className="row"><dt>Multiplier</dt><dd>1.25&times;</dd></div>
+                    <div className="row"><dt>History multiplier</dt><dd>125%</dd></div>
+                    <div className="row"><dt>Diversification premium</dt><dd className="good">+30%</dd></div>
+                    <div className="row"><dt>Drawn</dt><dd>250 TST</dd></div>
                   </dl>
                 </div>
               </div>
