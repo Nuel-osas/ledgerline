@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Ledgerline — BUIDL CTC 2026</title>
+<style>
+@page { size: 1280px 720px; margin: 0; }
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+:root{
+  --ground:#09090b; --panel:#101014; --panel-hi:#16161b; --well:#060608;
+  --line:#232329; --t1:#ededf1; --t2:#a6a6b2; --t3:#8c8c99;
+  --accent:#34d399; --warn:#ff3b41;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#000;font-family:var(--sans)}
+.slide{width:1280px;height:720px;background:var(--ground);color:var(--t2);padding:72px 88px;
+  position:relative;overflow:hidden;display:flex;flex-direction:column;
+  break-after:page;page-break-after:always;break-inside:avoid}
+.slide:last-of-type{break-after:auto;page-break-after:auto}
+.slide::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--accent)}
+.kicker{font:600 13px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:20px}
+h1{font:650 74px/1.03 var(--sans);letter-spacing:-.035em;color:var(--t1)}
+h2{font:650 44px/1.14 var(--sans);letter-spacing:-.025em;color:var(--t1);margin-bottom:24px;max-width:24ch}
+p{font-size:21px;line-height:1.55;max-width:62ch}
+.lead{font-size:25px;line-height:1.45;margin-top:20px;max-width:58ch}
+.dim{color:var(--t3)}
+code,.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.accent{color:var(--accent)}
+.foot{position:absolute;left:88px;right:88px;bottom:38px;display:flex;justify-content:space-between;
+  font:500 13px var(--mono);color:var(--t3);letter-spacing:.05em;border-top:1px solid var(--line);padding-top:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:10px}
+.card{background:var(--panel);border:1px solid var(--line);padding:26px 28px}
+.card h3{font:600 14px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:14px}
+.card p{font-size:17px;line-height:1.5}
+.big{font:650 56px/1 var(--sans);letter-spacing:-.03em;color:var(--t1);font-variant-numeric:tabular-nums}
+.big.g{color:var(--accent)}
+.unit{font-size:19px;color:var(--t3);margin-left:8px;font-weight:500}
+.rows{margin-top:18px;border-top:1px solid var(--line)}
+.row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:16px}
+.row span:first-child{color:var(--t3)}
+.row span:last-child{font-family:var(--mono);color:var(--t1)}
+pre{background:var(--well);border:1px solid var(--line);padding:22px 26px;font-family:var(--mono);
+  font-size:18px;line-height:1.7;color:var(--t2);margin-top:14px}
+pre b{color:var(--accent);font-weight:600}
+pre .r{color:var(--warn)}
+ul{list-style:none;margin-top:16px}
+li{font-size:20px;line-height:1.5;padding-left:26px;position:relative;margin-bottom:14px;max-width:60ch}
+li::before{content:"";position:absolute;left:0;top:11px;width:10px;height:2px;background:var(--accent)}
+.mark{position:absolute;top:64px;right:88px}
+.center{justify-content:center}
+</style></head><body>
+
+<!-- 1 -->
+<section class="slide center">
+  <svg class="mark" width="52" height="52" viewBox="0 0 24 24"><g fill="#34d399"><rect x="3" y="3" width="18" height="1.5"/><rect x="3" y="15" width="4.5" height="6"/><rect x="9.75" y="10.5" width="4.5" height="10.5"/><rect x="16.5" y="6" width="4.5" height="15"/></g></svg>
+  <div class="kicker">BUIDL CTC 2026 · DePIN · Attestcoin Protocol</div>
+  <h1>Ledgerline</h1>
+  <p class="lead">No DePIN network can underwrite its own operators.<br>
+  Ledgerline proves every earnings stream to Creditcoin and lends against the total.</p>
+  <p class="lead dim" style="font-size:20px">No collateral. No bridge.</p>
+  <div class="foot"><span>nuel-osas.github.io/ledgerline</span><span>github.com/Nuel-osas/ledgerline</span></div>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <div class="kicker">The problem</div>
+  <h2>Alone, every operator looks unbankable.</h2>
+  <p class="lead" style="font-size:22px">Someone runs a hotspot on one network, a storage node on another, a sensor on a third. Each network settles its own rewards on its own chain.</p>
+  <ul>
+    <li>The wireless network sees the hotspot. The storage network sees the node. Neither sees the other.</li>
+    <li>To every individual network the operator is a stranger with nothing to pledge.</li>
+    <li>In aggregate they are obviously good for it, and no network can see the aggregate.</li>
+  </ul>
+  <div class="foot"><span>Ledgerline</span><span>02</span></div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <div class="kicker">How it works</div>
+  <h2>Only a fact crosses. No token ever does.</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>Ethereum Sepolia</h3>
+      <p>A network settles earnings and emits <code>PaymentMade(operator, amount, period)</code>.</p>
+      <p style="margin-top:14px" class="dim">It never touches Creditcoin, signs nothing there, and bridges nothing.</p>
+    </div>
+    <div class="card">
+      <h3>Creditcoin CC3</h3>
+      <p>Anyone submits an Attestcoin proof to <code>IncomeRegistry.execute()</code>.</p>
+      <p style="margin-top:14px" class="dim">The <code>0x0FD2</code> precompile verifies it in that same transaction, and the settlement folds into one profile.</p>
+    </div>
+  </div>
+  <pre>limit = run-rate per period  x  (history + diversification)</pre>
+  <div class="foot"><span>Proof submission is permissionless</span><span>03</span></div>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <div class="kicker">The insight</div>
+  <h2>Diversification is priced, because it is real.</h2>
+  <p class="lead" style="font-size:21px">500 a period from one network is a worse credit than 500 across three. The first has a single point of failure: that network degrades and 100% of the income stops.</p>
+  <pre>1 network   ->  +0
+2 networks  ->  <b>+15%</b>
+3 or more   ->  <b>+30%</b></pre>
+  <p class="lead dim" style="font-size:19px">No individual network can price this, because none of them can see the others. Creditcoin can, because every stream is proven into the same registry.</p>
+  <div class="foot"><span>Ledgerline</span><span>04</span></div>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <div class="kicker">Live on testnet</div>
+  <h2>Three networks. One credit profile.</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>Proven revenue</h3>
+      <div class="big">3,900<span class="unit">TST</span></div>
+      <div class="rows">
+        <div class="row"><span>Wireless coverage</span><span>3,000</span></div>
+        <div class="row"><span>Decentralised storage</span><span>720</span></div>
+        <div class="row"><span>Environmental sensors</span><span>180</span></div>
+        <div class="row"><span>Run-rate</span><span>650 / period</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Credit granted</h3>
+      <div class="big g">1,007.5<span class="unit">TST</span></div>
+      <div class="rows">
+        <div class="row"><span>Collateral posted</span><span>none</span></div>
+        <div class="row"><span>History</span><span>125%</span></div>
+        <div class="row"><span>Diversification</span><span>+30%</span></div>
+        <div class="row"><span>Drawn</span><span>250</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>IncomeRegistry 0xC2559b84… · CreditLine 0x38D62C09…</span><span>05</span></div>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <div class="kicker">Risk</div>
+  <h2>A node that stops earning has stopped working.</h2>
+  <p class="lead" style="font-size:22px">There is no collateral to seize, so the risk model is cadence. For physical infrastructure that is a direct default signal rather than a proxy: revenue stops when the hardware stops.</p>
+  <p class="lead dim" style="font-size:20px">During development the registry accepted a fully proven six-period history and <span class="accent">still returned a limit of zero</span>, because that revenue was six months stale. The freeze fired before it was tested deliberately.</p>
+  <div class="foot"><span><code>isCurrent()</code> is a liveness check on a device</span><span>06</span></div>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <div class="kicker">Security</div>
+  <h2>Two bugs we shipped, found, and fixed.</h2>
+  <ul>
+    <li><b class="accent">Open settlement.</b> <code>pay()</code> was permissionless, so a wallet could self-transfer in a loop, netting to zero, and manufacture an earnings record for the price of gas. Now restricted to the network's paymaster. Found by running the attack, not by reading the code.</li>
+    <li><b class="accent">The credit model penalised diversifying.</b> Dividing by settlement count instead of distinct periods meant adding a smaller second stream lowered the limit. Only surfaced once the networks paid different amounts.</li>
+  </ul>
+  <p class="lead dim" style="font-size:18px;margin-top:18px">The base contract is hardened against two further flaws found in the tutorial's <code>USCBase</code> and filed upstream as gluwa/USC-Builder-Examples#37.</p>
+  <div class="foot"><span>Ledgerline</span><span>07</span></div>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <div class="kicker">Check it yourself</div>
+  <h2>Every claim is re-readable from public RPCs.</h2>
+  <pre>$ yarn verify
+  <b>PASS</b>  Income record: 3900.0 proven across 3 networks
+  <b>PASS</b>  Credit limit 1007.5 is derived from proven revenue
+        run-rate 650.0/period x (125% + 30%) = 1007.5
+  <b>PASS</b>  Operator has drawn 250.0, nothing pledged
+  <b>PASS</b>  A replayed settlement was <span class="r">rejected on-chain</span>
+        mined and reverted in block 5429631</pre>
+  <p class="lead dim" style="font-size:19px">No private key, no local state. <code>yarn preflight</code> answers whether a stranger can complete the demo right now.</p>
+  <div class="foot"><span>Ledgerline</span><span>08</span></div>
+</section>
+
+<!-- 9 -->
+<section class="slide center">
+  <svg class="mark" width="52" height="52" viewBox="0 0 24 24"><g fill="#34d399"><rect x="3" y="3" width="18" height="1.5"/><rect x="3" y="15" width="4.5" height="6"/><rect x="9.75" y="10.5" width="4.5" height="10.5"/><rect x="16.5" y="6" width="4.5" height="15"/></g></svg>
+  <div class="kicker">Scope, stated plainly</div>
+  <h2 style="font-size:36px">One source chain, three networks,<br>a single-lender pool.</h2>
+  <p class="lead" style="font-size:20px">No interest, no term, no secondary market. What is submitted is the primitive: foreign revenue, proven trustlessly, aggregated across networks, priced into unsecured credit.</p>
+  <p class="lead accent" style="font-size:22px;margin-top:28px">nuel-osas.github.io/ledgerline</p>
+  <div class="foot"><span>Ledgerline · BUIDL CTC 2026 · DePIN</span><span>09</span></div>
+</section>
+
+</body></html>
